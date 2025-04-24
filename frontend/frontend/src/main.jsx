@@ -13,6 +13,7 @@ import theme from "./theme/theme";
 import { InsuranceProvider } from "./context/InsuranceContext";
 import { AuthProvider } from "./context/AuthContext";
 
+
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <ThemeProvider theme={theme}>

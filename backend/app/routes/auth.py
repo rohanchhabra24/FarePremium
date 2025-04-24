@@ -5,12 +5,15 @@ from schemas.user import UserCreate, UserLogin, UserOut
 from database import SessionLocal
 from passlib.context import CryptContext
 
-router = APIRouter(prefix="/api/auth", tags=["Auth"])
+router = APIRouter(
+    prefix="/api/auth",
+    tags=["Auth"]
+)
 
-# Password hashing utility
+# Utility for securely hashing passwords
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# DB session dependency
+# Dependency to get DB session
 def get_db():
     db = SessionLocal()
     try:
@@ -18,15 +21,15 @@ def get_db():
     finally:
         db.close()
 
-# 🔐 Signup Route
+# 🔐 Signup Endpoint
 @router.post("/signup", response_model=UserOut)
 def signup(user: UserCreate, db: Session = Depends(get_db)):
-    # Check if email is already registered
+    # Check if user already exists
     existing_user = db.query(User).filter(User.email == user.email).first()
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
 
-    # Hash password before storing
+    # Hash password and create new user
     hashed_password = pwd_context.hash(user.password)
     new_user = User(name=user.name, email=user.email, password=hashed_password)
 
@@ -36,12 +39,12 @@ def signup(user: UserCreate, db: Session = Depends(get_db)):
 
     return new_user
 
-# 🔑 Login Route
+# 🔑 Login Endpoint
 @router.post("/login", response_model=UserOut)
 def login(user: UserLogin, db: Session = Depends(get_db)):
     db_user = db.query(User).filter(User.email == user.email).first()
 
-    # Validate credentials
+    # Check password match
     if not db_user or not pwd_context.verify(user.password, db_user.password):
         raise HTTPException(status_code=401, detail="Invalid email or password")
 

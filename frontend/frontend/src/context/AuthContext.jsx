@@ -1,13 +1,12 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const AuthContext = createContext();
-
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
-
   const [user, setUser] = useState(() => {
     const savedUser = localStorage.getItem("user");
     return savedUser ? JSON.parse(savedUser) : null;
@@ -15,36 +14,36 @@ export const AuthProvider = ({ children }) => {
 
   const isAuthenticated = !!user;
 
-  // ✅ Sync state to localStorage on change
   useEffect(() => {
-    if (user) {
-      localStorage.setItem("user", JSON.stringify(user));
-    } else {
-      localStorage.removeItem("user");
-    }
+    if (user) localStorage.setItem("user", JSON.stringify(user));
+    else localStorage.removeItem("user");
   }, [user]);
 
-  const login = (email, password) => {
-    if (!email || !password) {
-      alert("Please enter valid credentials");
-      return;
+  const login = async (email, password) => {
+    try {
+      const res = await axios.post("http://localhost:8000/api/auth/login", {
+        email,
+        password,
+      });
+      setUser(res.data);
+      navigate("/home");
+    } catch (err) {
+      alert("Login failed: " + (err.response?.data?.detail || "Unknown error"));
     }
-
-    // 🔐 Replace with real auth logic
-    const mockUser = { email };
-    setUser(mockUser);
-    navigate("/");
   };
 
-  const signup = (email, password) => {
-    if (!email || !password) {
-      alert("Please fill all fields to sign up");
-      return;
+  const signup = async (name, email, password) => {
+    try {
+      const res = await axios.post("http://localhost:8000/api/auth/signup", {
+        name,
+        email,
+        password,
+      });
+      setUser(res.data);
+      navigate("/home");
+    } catch (err) {
+      alert("Signup failed: " + (err.response?.data?.detail || "Unknown error"));
     }
-
-    const mockUser = { email };
-    setUser(mockUser);
-    navigate("/");
   };
 
   const logout = () => {

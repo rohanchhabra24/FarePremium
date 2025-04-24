@@ -1,34 +1,37 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from database import engine, Base
 from routes.insurance import router as insurance_router
-from routes.auth import router as auth_router  # ✅ Add auth routes
+from routes.auth import router as auth_router
+from routes.ai_assistant import router as ai_router  # ✅ Added AI Assistant route
 
-# Create DB tables
+from database import Base, engine
+
+# ✅ Create DB tables
 Base.metadata.create_all(bind=engine)
 
-# FastAPI app initialization
+# ✅ Initialize FastAPI App
 app = FastAPI(
-    title="Premium Insurance Backend API",
-    description="Handles premium calculation and user authentication",
+    title="FairPremium Insurance API",
+    description="Handles premium calculation, authentication, and AI explanations",
     version="1.0.0"
 )
 
-# CORS setup to allow frontend interaction
+# ✅ CORS configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5174"],  # Update as needed
+    allow_origins=["http://localhost:5173"],  # Update to frontend URL if deployed
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Health check route
+# ✅ Root Health Check
 @app.get("/")
 async def root():
-    return {"status": "Backend is running 👋"}
+    return {"message": "Backend is running 👋"}
 
-# Register routes
+# ✅ Register all API routers
 app.include_router(insurance_router)
-app.include_router(auth_router)  # ✅ Register auth route
+app.include_router(auth_router)
+app.include_router(ai_router)  # 👈 Register the AI Assistant route

@@ -1,7 +1,7 @@
 import {
   Box, Card, CardContent, CardHeader, CardActions, Typography, Divider, Button,
   Grid, Accordion, AccordionSummary, AccordionDetails, List, ListItem,
-  ListItemIcon, ListItemText, Chip, Stack, Container, CircularProgress
+  ListItemIcon, ListItemText, Chip, Stack, Container, CircularProgress, ToggleButton, ToggleButtonGroup
 } from "@mui/material";
 import { ExpandMore, CheckCircle, ArrowBack } from "@mui/icons-material";
 import { useInsurance } from "../context/InsuranceContext";
@@ -40,6 +40,7 @@ const PremiumResult = () => {
   const [basePremium, setBasePremium] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [selectedPlanId, setSelectedPlanId] = useState("standard");
 
   const fetchPremium = async () => {
     try {
@@ -49,7 +50,7 @@ const PremiumResult = () => {
         data: formData,
       });
       setBasePremium(res.data.premium);
-      setResult(res.data); // Save result globally if needed
+      setResult(res.data);
     } catch (err) {
       setError("Failed to fetch premium. Please try again.");
     } finally {
@@ -83,14 +84,14 @@ const PremiumResult = () => {
     premium: Math.round(basePremium * plan.multiplier)
   }));
 
-  const recommended = plans[1];
+  const selectedPlan = plans.find(p => p.id === selectedPlanId);
 
   const handleDownloadQuote = () => {
     const breakdown = {
       "Base Premium": Math.round(basePremium * 0.7),
       "Risk Factors": Math.round(basePremium * 0.2),
       "Taxes & Fees": Math.round(basePremium * 0.1),
-      "Total": basePremium,
+      "Total": selectedPlan.premium,
     };
 
     const terms = [
@@ -101,7 +102,7 @@ const PremiumResult = () => {
     ];
 
     generateQuotePDF({
-      plan: recommended,
+      plan: selectedPlan,
       userData: formData,
       premiumBreakdown: breakdown,
       terms,
@@ -111,7 +112,7 @@ const PremiumResult = () => {
   const handleGetThisPlan = () => {
     navigate("/payment", {
       state: {
-        selectedPlan: recommended,
+        selectedPlan,
         basePremium,
         formData,
         insuranceCategory,
@@ -132,28 +133,39 @@ const PremiumResult = () => {
 
         <Grid container spacing={4}>
           <Grid item xs={12} md={8}>
+            {/* 🔘 Plan Selector */}
+            <ToggleButtonGroup
+              exclusive
+              value={selectedPlanId}
+              onChange={(e, val) => val && setSelectedPlanId(val)}
+              sx={{ mb: 3 }}
+            >
+              {plans.map((p) => (
+                <ToggleButton key={p.id} value={p.id}>
+                  {p.name}
+                </ToggleButton>
+              ))}
+            </ToggleButtonGroup>
+
+            {/* 💎 Plan Details */}
             <Card elevation={2} sx={{ borderRadius: 3 }}>
               <CardHeader
-                title={<Typography variant="h6" fontWeight={600}>Recommended Plan</Typography>}
-                subheader="Based on your input"
+                title={<Typography variant="h6" fontWeight={600}>{selectedPlan.name}</Typography>}
+                subheader={`Offered by ${selectedPlan.insurer}`}
                 action={<Chip label="Best Value" color="primary" />}
               />
               <CardContent>
-                <Typography variant="subtitle1" fontWeight={600}>{recommended.name}</Typography>
-                <Typography variant="body2" color="text.secondary" gutterBottom>
-                  by {recommended.insurer}
-                </Typography>
                 <Typography variant="h4" fontWeight="bold">
-                  ₹{recommended.premium.toLocaleString()} <Typography component="span" variant="body1">/year</Typography>
+                  ₹{selectedPlan.premium.toLocaleString()} <Typography component="span" variant="body1">/year</Typography>
                 </Typography>
                 <Typography variant="body2" color="text.secondary" mb={2}>
-                  or ₹{Math.round(recommended.premium / 12)}/month
+                  or ₹{Math.round(selectedPlan.premium / 12)}/month
                 </Typography>
 
                 <Divider sx={{ my: 2 }} />
                 <Typography variant="subtitle1" fontWeight={600}>Key Features</Typography>
                 <List>
-                  {recommended.features.map((feature, i) => (
+                  {selectedPlan.features.map((feature, i) => (
                     <ListItem key={i} disablePadding>
                       <ListItemIcon sx={{ minWidth: 30 }}>
                         <CheckCircle color="success" />
@@ -173,38 +185,7 @@ const PremiumResult = () => {
               </CardActions>
             </Card>
 
-            {/* Other Plans */}
-            <Box mt={5}>
-              <Typography variant="h6" mb={2} fontWeight={600}>Other Available Plans</Typography>
-              <Stack spacing={2}>
-                {plans.filter(p => p.id !== recommended.id).map((plan) => (
-                  <Card key={plan.id} variant="outlined" sx={{ borderRadius: 2 }}>
-                    <CardContent>
-                      <Box display="flex" justifyContent="space-between" alignItems="center">
-                        <Box>
-                          <Typography fontWeight={600}>{plan.name}</Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            by {plan.insurer}
-                          </Typography>
-                        </Box>
-                        <Box textAlign="right">
-                          <Typography fontWeight={600}>
-                            ₹{plan.premium.toLocaleString()}
-                          </Typography>
-                          <Typography variant="caption" color="text.secondary">
-                            ₹{Math.round(plan.premium / 12)}/month
-                          </Typography>
-                        </Box>
-                      </Box>
-                      <Button variant="outlined" size="small" sx={{ mt: 2 }}>
-                        View Details
-                      </Button>
-                    </CardContent>
-                  </Card>
-                ))}
-              </Stack>
-            </Box>
-
+            {/* 🔽 Accordion */}
             <Box mt={6}>
               <Accordion>
                 <AccordionSummary expandIcon={<ExpandMore />}>
@@ -212,7 +193,7 @@ const PremiumResult = () => {
                 </AccordionSummary>
                 <AccordionDetails>
                   <Typography variant="body2">
-                    Benefit breakdowns will go here for {insuranceType} insurance.
+                    Benefits based on selected plan will be listed here.
                   </Typography>
                 </AccordionDetails>
               </Accordion>
@@ -222,14 +203,14 @@ const PremiumResult = () => {
                 </AccordionSummary>
                 <AccordionDetails>
                   <Typography variant="body2">
-                    Policy terms and key exclusions listed here.
+                    Detailed disclaimers based on selected policy.
                   </Typography>
                 </AccordionDetails>
               </Accordion>
             </Box>
           </Grid>
 
-          {/* Premium Breakdown Sidebar */}
+          {/* 💰 Sidebar */}
           <Grid item xs={12} md={4}>
             <Card sx={{ position: "sticky", top: 100, borderRadius: 3 }}>
               <CardHeader title={<Typography variant="h6" fontWeight={600}>Premium Breakdown</Typography>} />
@@ -255,7 +236,7 @@ const PremiumResult = () => {
                 </Stack>
                 <Box mt={2} p={2} bgcolor="grey.100" borderRadius={2}>
                   <Typography variant="body2" color="text.secondary">
-                    This estimate is based on your inputs and may vary.
+                    Based on selected plan and input details.
                   </Typography>
                 </Box>
               </CardContent>

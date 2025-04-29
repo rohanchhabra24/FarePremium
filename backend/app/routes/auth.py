@@ -21,7 +21,7 @@ def get_db():
     finally:
         db.close()
 
-# 🔐 Signup Endpoint
+# Signup Endpoint
 @router.post("/signup", response_model=UserOut)
 def signup(user: UserCreate, db: Session = Depends(get_db)):
     # Check if user already exists
@@ -39,7 +39,7 @@ def signup(user: UserCreate, db: Session = Depends(get_db)):
 
     return new_user
 
-# 🔑 Login Endpoint
+# Login Endpoint
 @router.post("/login", response_model=UserOut)
 def login(user: UserLogin, db: Session = Depends(get_db)):
     db_user = db.query(User).filter(User.email == user.email).first()

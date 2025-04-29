@@ -1,7 +1,8 @@
 import {
   Box, Card, CardContent, CardHeader, CardActions, Typography, Divider, Button,
   Grid, Accordion, AccordionSummary, AccordionDetails, List, ListItem,
-  ListItemIcon, ListItemText, Chip, Stack, Container, CircularProgress, ToggleButton, ToggleButtonGroup
+  ListItemIcon, ListItemText, Chip, Stack, Container, CircularProgress,
+  ToggleButton, ToggleButtonGroup
 } from "@mui/material";
 import { ExpandMore, CheckCircle, ArrowBack } from "@mui/icons-material";
 import { useInsurance } from "../context/InsuranceContext";
@@ -133,7 +134,6 @@ const PremiumResult = () => {
 
         <Grid container spacing={4}>
           <Grid item xs={12} md={8}>
-            {/* 🔘 Plan Selector */}
             <ToggleButtonGroup
               exclusive
               value={selectedPlanId}
@@ -147,7 +147,6 @@ const PremiumResult = () => {
               ))}
             </ToggleButtonGroup>
 
-            {/* 💎 Plan Details */}
             <Card elevation={2} sx={{ borderRadius: 3 }}>
               <CardHeader
                 title={<Typography variant="h6" fontWeight={600}>{selectedPlan.name}</Typography>}
@@ -185,7 +184,6 @@ const PremiumResult = () => {
               </CardActions>
             </Card>
 
-            {/* 🔽 Accordion */}
             <Box mt={6}>
               <Accordion>
                 <AccordionSummary expandIcon={<ExpandMore />}>
@@ -210,7 +208,6 @@ const PremiumResult = () => {
             </Box>
           </Grid>
 
-          {/* 💰 Sidebar */}
           <Grid item xs={12} md={4}>
             <Card sx={{ position: "sticky", top: 100, borderRadius: 3 }}>
               <CardHeader title={<Typography variant="h6" fontWeight={600}>Premium Breakdown</Typography>} />
@@ -231,7 +228,7 @@ const PremiumResult = () => {
                   <Divider sx={{ my: 1 }} />
                   <Box display="flex" justifyContent="space-between" fontWeight="bold">
                     <Typography>Total Premium</Typography>
-                    <Typography>₹{basePremium.toLocaleString()}</Typography>
+                    <Typography>₹{selectedPlan.premium.toLocaleString()}</Typography>
                   </Box>
                 </Stack>
                 <Box mt={2} p={2} bgcolor="grey.100" borderRadius={2}>

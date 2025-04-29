@@ -86,7 +86,7 @@ import {
         };
   
         await sendConfirmationEmail(templateParams);
-        console.log("✅ Email sent successfully");
+        console.log("Email sent successfully");
   
         navigate("/success", {
           state: {
@@ -98,7 +98,7 @@ import {
           },
         });
       } catch (error) {
-        console.error("❌ Email sending failed:", error);
+        console.error("Email sending failed:", error);
         alert("Something went wrong while sending email. Please try again.");
       }
     };

@@ -58,7 +58,7 @@ const DynamicForm = () => {
 
       if (!response.ok) {
         const err = await response.json();
-        console.error("❌ Error from backend:", err);
+        console.error("Error from backend:", err);
         throw new Error(err?.detail || "Backend returned an error");
       }
 

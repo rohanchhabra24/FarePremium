@@ -1,4 +1,3 @@
-// src/api/openaiApi.js
 import axios from "axios";
 
 export const getPlanExplanation = async (plan) => {

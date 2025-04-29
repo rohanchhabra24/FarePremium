@@ -8,7 +8,7 @@ from schemas.insurance import (
     FireBurglaryInsuranceRequest
 )
 
-# 🚗 Auto
+#  Auto
 def calculate_auto_premium(data: AutoInsuranceRequest) -> float:
     base = 3000
 
@@ -40,7 +40,7 @@ def calculate_auto_premium(data: AutoInsuranceRequest) -> float:
     return round(premium * city_multiplier.get(data.city, 1.0), 2)
 
 
-# ❤️ Life / Health
+# Life / Health
 def calculate_life_health_premium(data: LifeHealthInsuranceRequest) -> float:
     base = 4000 + (data.members * 300)
 
@@ -67,14 +67,14 @@ def calculate_life_health_premium(data: LifeHealthInsuranceRequest) -> float:
     return round(base * city_risk.get(data.city, 1.0), 2)
 
 
-# 🏢 Small Business
+#  Small Business
 def calculate_small_business_premium(data: SmallBusinessInsuranceRequest) -> float:
     multiplier = {"Low": 1.0, "Medium": 1.5, "High": 2.0}
     premium = (data.revenue * 0.01) + (data.employees * 150)
     return round(premium * multiplier.get(data.riskFactor, 1.0), 2)
 
 
-# 🏠 Homeowners
+#  Homeowners
 def calculate_homeowners_premium(data: HomeownersInsuranceRequest) -> float:
     base = data.propertyValue * 0.012
 
@@ -96,7 +96,7 @@ def calculate_homeowners_premium(data: HomeownersInsuranceRequest) -> float:
     return round(base, 2)
 
 
-# 🔥 Fire & Burglary
+#  Fire & Burglary
 def calculate_fire_burglary_premium(data: FireBurglaryInsuranceRequest) -> float:
     crime_rate_mult = {"Low": 1.1, "Moderate": 1.5, "High": 2.0}
     safety_discount = 0

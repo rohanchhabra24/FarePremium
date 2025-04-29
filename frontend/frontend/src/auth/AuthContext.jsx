@@ -16,7 +16,7 @@ export const AuthProvider = ({ children }) => {
   const isAuthenticated = !!user;
 
   const login = (email, password) => {
-    // 👉 Replace this with API call in real app
+    //Replace this with API call in real app
     const mockUser = { email };
     localStorage.setItem("user", JSON.stringify(mockUser));
     setUser(mockUser);
@@ -24,7 +24,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const signup = (email, password) => {
-    // 👉 Replace this with API call in real app
+    //Replace this with API call in real app
     const mockUser = { email };
     localStorage.setItem("user", JSON.stringify(mockUser));
     setUser(mockUser);
